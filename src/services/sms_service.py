@@ -1,10 +1,10 @@
-from django.conf import settings
 from kavenegar import *
+from VLE.config import config
 
 
 def send(receptor, message):
     try:
-        api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
+        api = KavenegarAPI(config.KAVENEGAR_API_KEY)
         params = {
             'sender': '',
             'receptor': receptor,
