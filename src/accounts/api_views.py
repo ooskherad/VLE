@@ -1,6 +1,7 @@
 import random
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
@@ -13,8 +14,13 @@ from rest_framework import status
 from services.otp_service import OtpService
 
 
-class UserLogin(APIView):
+class UserLogout(LoginRequiredMixin, APIView):
+    def post(self, request):
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
 
+
+class UserLogin(APIView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
@@ -35,11 +41,10 @@ class UserLogin(APIView):
 
 
 class UserRegistrationVerifyOtpView(APIView):
-
     def post(self, request, *args, **kwargs):
         user_session = request.session['user_registration_info']
         if OtpService.check_code(user_session['mobile'], int(request.data['code'])):
-            User.objects.create_user(mobile=user_session['mobile'], password=user_session['password'])
+            user = User.objects.create_user(mobile=user_session['mobile'], password=user_session['password'])
             OtpCode.objects.filter(mobile=user_session['mobile']).delete()
             token = Token.objects.get_or_create(user=user)
             return Response(data={'token': token[0].__str__()}, status=status.HTTP_201_CREATED)
@@ -47,7 +52,6 @@ class UserRegistrationVerifyOtpView(APIView):
 
 
 class UserRegistrationView(APIView):
-
     def post(self, request, *args, **kwargs):
         data = UserSerializer(data=request.data)
         if data.is_valid():
