@@ -2,9 +2,10 @@ from pydantic import BaseSettings
 
 
 class Config(BaseSettings):
-    DEBUG = False
+    DEBUG = True
     APP_TITLE = "virtual learning environment"
 
+    SECRET_KEY = ''
     DATABASE_NAME = 'vle'
     DATABASE_USER = 'postgres'
     DATABASE_PASSWORD = '1234'
