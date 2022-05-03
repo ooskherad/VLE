@@ -1,3 +1,3 @@
-## Virtual Learning Envoirement 
-# docker-compose build
-# docker-compose up -d
+# Virtual Learning Envoirement 
+### docker-compose build
+### docker-compose up -d
