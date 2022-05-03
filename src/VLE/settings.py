@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'storages',
     'corsheaders',
+    'drf_yasg',
 
     # local apps
     'accounts.apps.AccountsConfig',
