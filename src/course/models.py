@@ -1,16 +1,27 @@
 from django.db import models
 
-from home.models import Enumerations, Files
+from home.models import Enumerations, Files, Category
 from instructor.models import Instructor
 
 
 class Courses(models.Model):
     title = models.CharField(max_length=255)
-    price = models.FloatField()
+    slug = models.SlugField()
+    price = models.FloatField(default=0)
     level = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class CourseCategories(models.Model):
+    class Meta:
+        db_table = 'course_categories'
+
+    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(to=Category, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, default=None)
 
 
 class CourseOwners(models.Model):
