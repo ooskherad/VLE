@@ -1,8 +1,42 @@
 import boto3
 from VLE.config import config
+from botocore.exceptions import ClientError
+
 
 class Bucket:
     _client = None
+    _resource = None
+
+    @classmethod
+    def get_resource(cls):
+        if cls._resource is None:
+            try:
+                s3_resource = boto3.resource(
+                    config.AWS_SERVICE_NAME,
+                    endpoint_url=config.AWS_S3_ENDPOINT_URL,
+                    aws_access_key_id=config.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY,
+                )
+                cls._resource = s3_resource
+            except Exception as exc:
+                pass
+
+        return cls._resource
+
+    def upload_file_with_path(self, file_path, object_name, bucket_name=config.AWS_STORAGE_BUCKET_NAME, acl='private'):
+        with open(file_path, "rb") as file:
+            self.upload_file(file, object_name, bucket_name, acl)
+
+    def upload_file(self, file, object_name, bucket_name=config.AWS_STORAGE_BUCKET_NAME, acl='private'):
+        try:
+            bucket = self.get_resource().Bucket(bucket_name)
+            bucket.put_object(
+                ACL=acl,
+                Body=file,
+                Key=object_name
+            )
+        except ClientError as e:
+            pass
 
     @classmethod
     def get_client(cls):
@@ -44,4 +78,3 @@ class Bucket:
 
 
 bucket = Bucket()
-
