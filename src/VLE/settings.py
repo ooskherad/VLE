@@ -38,9 +38,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'storages',
     'corsheaders',
+    'drf_yasg',
 
     # local apps
     'accounts.apps.AccountsConfig',
+    'home.apps.HomeConfig',
+    'course.apps.CourseConfig',
+    'instructor.apps.InstructorConfig',
 ]
 
 MIDDLEWARE = [

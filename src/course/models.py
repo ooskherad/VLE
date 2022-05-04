@@ -1,16 +1,27 @@
 from django.db import models
 
-from home.models import Enumerations
+from home.models import Enumerations, Files, Category
 from instructor.models import Instructor
 
 
 class Courses(models.Model):
     title = models.CharField(max_length=255)
-    price = models.FloatField()
+    slug = models.SlugField()
+    price = models.FloatField(default=0)
     level = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class CourseCategories(models.Model):
+    class Meta:
+        db_table = 'course_categories'
+
+    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(to=Category, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, default=None)
 
 
 class CourseOwners(models.Model):
@@ -71,3 +82,8 @@ class CourseSubSectionItemContent(models.Model):
         db_table = 'course_sub_section_item_contents'
 
     course_sub_section_item = models.ForeignKey(to=CourseSubSectionItems, on_delete=models.DO_NOTHING)
+    content = models.CharField(max_length=255, null=True, default=None)
+    content_type_id = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
+    file_id = models.ForeignKey(to=Files, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, default=None)
