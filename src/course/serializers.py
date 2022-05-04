@@ -2,7 +2,7 @@ from django.utils.text import slugify
 from rest_framework import serializers
 from django.db import transaction
 
-from .models import Courses, CourseCategories, CourseOwners, CourseSections, CourseSubSections
+from .models import *
 from instructor.models import Instructor
 
 
@@ -10,14 +10,10 @@ class CourseSectionSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField()
     about_section = serializers.CharField()
-    course_id = serializers.IntegerField(write_only=True)
+    course_id = serializers.IntegerField()
 
     def create(self, validated_data):
-        return CourseSections.objects.create(
-            course_id=validated_data['course_id'],
-            title=validated_data['title'],
-            about_section=validated_data['about_section'],
-        )
+        return CourseSections.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         pass
@@ -52,13 +48,38 @@ class CourseSerializer(serializers.Serializer):
 class CourseSubSectionSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField()
-    course_section_id = serializers.IntegerField(write_only=True)
+    course_section_id = serializers.IntegerField()
 
     def create(self, validated_data):
-        return CourseSubSections.objects.create(
-            course_section_id=validated_data['course_section_id'],
-            title=validated_data['title'],
-        )
+        return CourseSubSections.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        pass
+
+
+class CourseSubSectionItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    course_sub_section_id = serializers.IntegerField()
+    title = serializers.CharField()
+    type_id = serializers.IntegerField()
+    time_duration = serializers.IntegerField()
+    price = serializers.FloatField(default=0)
+
+    def create(self, validated_data):
+        return CourseSubSectionItems.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        pass
+
+
+class CourseSubSectionItemContentSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    course_sub_section_item_id = serializers.IntegerField()
+    content_type_id = serializers.IntegerField()
+    content = serializers.CharField(default=None)
+
+    def create(self, validated_data):
+        return CourseSubSectionItemContent.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         pass

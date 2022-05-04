@@ -28,7 +28,6 @@ class Files(models.Model):
     type = models.CharField(max_length=20)
     format = models.CharField(max_length=20)
     title = models.CharField(max_length=255)
-    name = models.FilePathField()
     size = models.IntegerField()
     group_id = models.ForeignKey(to=FileGroup, on_delete=models.CASCADE)
     created_by = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
