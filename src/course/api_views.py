@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework import status
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from helpers import SerializerContext
-from services.bucket_service import bucket
 from home.services.file import FileService
 from permissions import IsInstructor
 from .serializers import *
@@ -32,7 +32,9 @@ class CreateCoursesView(CreateAbstract):
 
     def post(self, request):
         data = request.data
-        data.update(user_id=request.user.id)
+        instructor = Instructor.objects.get(user=request.user)
+        categories = [{'category': category} for category in data.pop('categories')]
+        data.update(owners=[{'instructor': instructor.id}], categories=categories)
         return self.create(data)
 
 
@@ -81,3 +83,33 @@ class CreateItemContentView(CreateAbstract):
             file_instance = file_service.upload_and_save()
             request.data.update(file_id=file_instance.id)
         return self.create(request.data)
+
+
+class GetCourses(APIView):
+
+    def get(self, request):
+        """
+        query_params: <int:limit = 6>, <str:order_by_field = -created_at>
+        :param q: query text for search in title
+        :return: list of Courses
+        """
+        query_set = self.get_query_set(request.GET)
+        return Response({'result': query_set}, status=status.HTTP_200_OK)
+
+    def get_query_set(self, query_params):
+        limit = int(query_params.get('limit')) if query_params.get('limit') else 6
+        order_by_field = query_params.get('order_by_field') if query_params.get('order_by_field') else '-created_at'
+        q = query_params.get('q')
+        if q:
+            courses = Courses.objects.all().filter(title__contains=q).order_by(order_by_field)[:limit]
+        else:
+            courses = Courses.objects.all().order_by(order_by_field)[:limit]
+
+        if not courses:
+            return []
+        data = []
+        for course in courses:
+            course_serializer = CourseSerializer(instance=course).data
+            data.append(course_serializer)
+
+        return data
