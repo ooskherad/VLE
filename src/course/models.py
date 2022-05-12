@@ -13,12 +13,15 @@ class Courses(models.Model):
     deleted_at = models.DateTimeField(null=True, default=None)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def course_sections_relations(self):
+        pass
+
 
 class CourseCategories(models.Model):
     class Meta:
         db_table = 'course_categories'
 
-    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING)
+    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING, related_name='categories')
     category = models.ForeignKey(to=Category, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
@@ -28,7 +31,7 @@ class CourseOwners(models.Model):
     class Meta:
         db_table = 'course_owners'
 
-    course = models.ForeignKey(to=Courses, on_delete=models.CASCADE)
+    course = models.ForeignKey(to=Courses, on_delete=models.CASCADE, related_name='owners')
     instructor = models.ForeignKey(to=Instructor, on_delete=models.CASCADE)
 
 
@@ -36,7 +39,7 @@ class CourseSections(models.Model):
     class Meta:
         db_table = 'course_sections'
 
-    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING)
+    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING, related_name='sections')
     title = models.CharField(max_length=255)
     about_section = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,7 +51,7 @@ class CourseSubSections(models.Model):
         db_table = 'course_sub_sections'
 
     title = models.CharField(max_length=255)
-    course_section = models.ForeignKey(to=CourseSections, on_delete=models.DO_NOTHING)
+    course_section = models.ForeignKey(to=CourseSections, on_delete=models.DO_NOTHING, related_name='sub_sections')
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
 
@@ -57,7 +60,8 @@ class CourseSubSectionItems(models.Model):
     class Meta:
         db_table = 'course_sub_section_items'
 
-    course_sub_section = models.ForeignKey(to=CourseSubSections, on_delete=models.DO_NOTHING)
+    course_sub_section = models.ForeignKey(to=CourseSubSections, on_delete=models.DO_NOTHING,
+                                           related_name='sub_section_item')
     title = models.CharField(max_length=255)
     type = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     time_duration = models.IntegerField()
@@ -81,7 +85,8 @@ class CourseSubSectionItemContent(models.Model):
     class Meta:
         db_table = 'course_sub_section_item_contents'
 
-    course_sub_section_item = models.ForeignKey(to=CourseSubSectionItems, on_delete=models.DO_NOTHING)
+    course_sub_section_item = models.ForeignKey(to=CourseSubSectionItems, on_delete=models.DO_NOTHING,
+                                                related_name='sub_section_item_content')
     content = models.CharField(max_length=255, null=True, default=None)
     content_type_id = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     file_id = models.ForeignKey(to=Files, on_delete=models.CASCADE, null=True, default=None)

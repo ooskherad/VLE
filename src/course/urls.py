@@ -4,7 +4,8 @@ from rest_framework.authtoken import views
 
 app_name = "course"
 api_urlpatterns = [
-    path('create', CreateItemContentView.as_view()),
+    path('create', CreateCoursesView.as_view()),
+    path('ping', GetCourses.as_view())
 ]
 
 urlpatterns = [

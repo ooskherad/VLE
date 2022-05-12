@@ -15,6 +15,9 @@ class Enumerations(models.Model):
     created_by = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.title
+
 
 class FileGroup(models.Model):
     class Meta:
