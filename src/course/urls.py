@@ -9,9 +9,8 @@ api_urlpatterns = [
     path('create_subsection', CreateCourseSubSectionView.as_view()),
     path('create_item', CreateCourseSubSectionItemView.as_view()),
     path('create_item_content', CreateItemContentView.as_view()),
-    path('ping', GetCourses.as_view())
 ]
 
 urlpatterns = [
-
+    path('courses', GetCourses.as_view())
 ]
