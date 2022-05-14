@@ -11,7 +11,7 @@ from permissions import IsInstructor
 from .serializers import *
 
 
-class CreateAbstract(LoginRequiredMixin, APIView, SerializerContext):
+class CreateAbstract(APIView, SerializerContext):
     permission_classes = [IsInstructor, ]
 
     def create(self, data):
@@ -31,10 +31,12 @@ class CreateCoursesView(CreateAbstract):
     serializer_class = CourseSerializer
 
     def post(self, request):
+        """
+        ### owners parameter is optional now (it will need for add owner to a course)
+        """
         data = request.data
         instructor = Instructor.objects.get(user=request.user)
-        categories = [{'category': category} for category in data.pop('categories')]
-        data.update(owners=[{'instructor': instructor.id}], categories=categories)
+        data.update(owners=[{'instructor': instructor.id}])
         return self.create(data)
 
 
@@ -42,7 +44,7 @@ class CreateCourseSectionView(CreateAbstract):
     serializer_class = CourseSectionSerializer
 
     def post(self, request):
-        course = get_object_or_404(Courses, id=request.data.get('course_id'))
+        course = get_object_or_404(Courses, id=request.data.get('course'))
         self.check_object_permissions(request, course)
         return self.create(request.data)
 
@@ -51,7 +53,7 @@ class CreateCourseSubSectionView(CreateAbstract):
     serializer_class = CourseSubSectionSerializer
 
     def post(self, request):
-        course_section = get_object_or_404(CourseSections, id=request.data.get('course_section_id'))
+        course_section = get_object_or_404(CourseSections, id=request.data.get('course_section'))
         course = course_section.course
         self.check_object_permissions(request, course)
         return self.create(request.data)
@@ -61,7 +63,7 @@ class CreateCourseSubSectionItemView(CreateAbstract):
     serializer_class = CourseSubSectionItemSerializer
 
     def post(self, request):
-        course_sub_section = get_object_or_404(CourseSubSections, id=request.data.get('course_sub_section_id'))
+        course_sub_section = get_object_or_404(CourseSubSections, id=request.data.get('course_sub_section'))
         course_section = course_sub_section.course_section
         course = course_section.course
         self.check_object_permissions(request, course)
@@ -72,7 +74,7 @@ class CreateItemContentView(CreateAbstract):
     serializer_class = CourseSubSectionItemContentSerializer
 
     def post(self, request):
-        course_sub_section_item = get_object_or_404(CourseSubSectionItems, id=request.data.get('course_sub_section_id'))
+        course_sub_section_item = get_object_or_404(CourseSubSectionItems, id=request.data.get('course_sub_section_item'))
         course_sub_section = course_sub_section_item.course_sub_section
         course_section = course_sub_section.course_section
         course = course_section.course

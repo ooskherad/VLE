@@ -89,6 +89,6 @@ class CourseSubSectionItemContent(models.Model):
                                                 related_name='sub_section_item_content')
     content = models.CharField(max_length=255, null=True, default=None)
     content_type_id = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
-    file_id = models.ForeignKey(to=Files, on_delete=models.CASCADE, null=True, default=None)
+    file = models.ForeignKey(to=Files, on_delete=models.CASCADE, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)

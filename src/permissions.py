@@ -24,6 +24,6 @@ class IsInstructor(permissions.BasePermission):
         from course.models import CourseOwners
         if request.method in permissions.SAFE_METHODS:
             return True
-        owner = CourseOwners.objects.get(obj.id)
-        user = Instructor.objects.get(id=owner.instructor)
+        owner = CourseOwners.objects.get(course=obj)
+        user = Instructor.objects.get(id=owner.instructor.id)
         return user.id == request.user.id
