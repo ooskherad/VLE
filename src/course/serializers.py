@@ -7,6 +7,22 @@ from instructor.models import Instructor
 from home.serializers import CategorySerializer, EnumerationSerializer
 
 
+class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    """
+    A ModelSerializer that takes an additional `fields` argument that
+    controls which fields should be displayed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            not_allowed = set(fields)
+            for field_name in not_allowed:
+                self.fields.pop(field_name)
+
+
 class CourseOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseOwners
@@ -23,9 +39,11 @@ class CourseCategorySerializer(serializers.ModelSerializer):
 
 
 class CourseSubSectionItemContentSerializer(serializers.ModelSerializer):
+    content_type_id = serializers.StringRelatedField()
+
     class Meta:
         model = CourseSubSectionItemContent
-        fields = ['id', 'course_sub_section_item', 'content', 'content_type_id']
+        fields = ['id', 'created_at', 'course_sub_section_item', 'content', 'content_type_id', 'file']
 
 
 class CourseSubSectionItemSerializer(serializers.ModelSerializer):
@@ -58,7 +76,7 @@ class CourseSectionSerializer(serializers.ModelSerializer):
         fields = ['id', 'course', 'title', 'about_section', 'created_at', 'sub_sections']
 
 
-class CourseSerializer(serializers.ModelSerializer):
+class CourseSerializer(DynamicFieldsModelSerializer):
     sections = CourseSectionSerializer(many=True, read_only=True)
     owners = CourseOwnerSerializer(many=True, write_only=True)
     categories = CourseCategorySerializer(many=True)
