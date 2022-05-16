@@ -30,7 +30,7 @@ class Bucket:
     def upload_file(self, file, object_name, bucket_name=config.AWS_STORAGE_BUCKET_NAME, acl='private'):
         try:
             bucket = self.get_resource().Bucket(bucket_name)
-            bucket.put_object(
+            return bucket.put_object(
                 ACL=acl,
                 Body=file,
                 Key=object_name
