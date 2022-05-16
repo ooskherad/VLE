@@ -78,13 +78,14 @@ class CourseSectionSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(DynamicFieldsModelSerializer):
     sections = CourseSectionSerializer(many=True, read_only=True)
-    owners = CourseOwnerSerializer(many=True, write_only=True)
+    owners = CourseOwnerSerializer(many=True, write_only=True, required=False)
     categories = CourseCategorySerializer(many=True)
     course_level = serializers.StringRelatedField()
+    image = serializers.CharField(required=False)
 
     class Meta:
         model = Courses
-        fields = ['id', 'title', 'price', 'course_level', 'level', 'owners', 'categories', 'sections', ]
+        fields = ['id', 'title', 'price', 'image', 'course_level', 'level', 'owners', 'categories', 'sections', ]
 
     def create(self, validated_data):
         owners = validated_data.pop('owners')

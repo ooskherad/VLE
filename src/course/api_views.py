@@ -13,6 +13,7 @@ from helpers import SerializerContext
 from home.services.file import FileService
 from permissions import IsInstructor
 from .serializers import *
+from home.enumerations.group_file_enumerations import GroupFileEnums
 
 
 class CreateAbstract(APIView, SerializerContext):
@@ -41,6 +42,12 @@ class CreateCoursesView(CreateAbstract):
         data = request.data
         instructor = Instructor.objects.get(user=request.user)
         data.update(owners=[{'instructor': instructor.id}])
+        if data.get('image'):
+            image = data.pop('image')[0]
+            file_service = FileService(file=image.file, file_name=image.name, user=request.user,
+                                       group_file=GroupFileEnums.COURSE_FILES)
+            file_instance = file_service.upload_and_save()
+            request.data.update(image=file_instance.title)
         return self.create(data)
 
 
@@ -86,7 +93,8 @@ class CreateItemContentView(CreateAbstract):
         self.check_object_permissions(request, course)
         file = request.FILES
         if file:
-            file_service = FileService(file=file.get('file').file, file_name=file.get('file').name, user=request.user)
+            file_service = FileService(file=file.get('file').file, file_name=file.get('file').name, user=request.user,
+                                       group_file=GroupFileEnums.COURSE_CONTENTS)
             file_instance = file_service.upload_and_save()
             request.data.update(file_id=file_instance.id)
         return self.create(request.data)
