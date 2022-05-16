@@ -10,20 +10,20 @@ class FileUploadException(Exception):
 
 
 class FileService:
-    def __init__(self, file, file_name, user):
+    def __init__(self, file, file_name, user, group_file):
         self.file = file
         self.file_name = file_name
         self.user = user
         self.upload_data = None
+        self.group_file = group_file
 
     def upload_and_save(self):
-        self.upload_data()
+        self.upload_file()
         return self.save_in_files()
 
     def upload_file(self):
         name = self.make_obj_name
-        self.upload_data = bucket.upload_file(file=self.file, object_name=name)
-        return self.upload_data
+        self.upload_data = bucket.upload_file(file=self.file, object_name=name).get()
 
     def save_in_files(self):
         if self.successful_update:
@@ -49,10 +49,6 @@ class FileService:
     @property
     def successful_update(self):
         return True if self.upload_data['ResponseMetadata']['HTTPStatusCode'] == 200 else False
-
-    @property
-    def group_file(self):
-        return
 
     @property
     def file_format(self):

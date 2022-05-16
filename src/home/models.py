@@ -32,7 +32,7 @@ class Files(models.Model):
     format = models.CharField(max_length=20)
     title = models.CharField(max_length=255)
     size = models.IntegerField()
-    group_id = models.ForeignKey(to=FileGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(to=FileGroup, on_delete=models.CASCADE)
     created_by = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)

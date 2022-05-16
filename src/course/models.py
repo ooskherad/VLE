@@ -9,6 +9,7 @@ class Courses(models.Model):
     slug = models.SlugField()
     price = models.FloatField(default=0)
     level = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
+    image = models.ImageField(default='course_default.jpeg')
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
     updated_at = models.DateTimeField(auto_now=True)
