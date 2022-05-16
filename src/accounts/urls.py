@@ -12,4 +12,5 @@ api_urlpatterns = [
 
 urlpatterns = [
     path('login', UserLogin.as_view()),
+    path('profile/<int:id>', UserProfile.as_view()),
 ]
