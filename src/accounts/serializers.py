@@ -5,6 +5,8 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True)
+
     class Meta:
         model = User
         fields = ('name', 'mobile', 'email', 'date_of_birth', 'password', 'profile_image')
@@ -16,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
-            if attr =='password':
+            if attr == 'password':
                 instance.set_password(value)
             else:
                 setattr(instance, attr, value)
@@ -37,4 +39,3 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_user(self):
         return User(self)
-

@@ -6,12 +6,14 @@ from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from permissions import IsOwnerOrReadOnly
 from accounts.models import User, OtpCode
 from accounts.serializers import UserSerializer
 from rest_framework import status
 from services.otp_service import OtpService
+from instructor.serializers import InstructorSerializer
 
 
 class UserLogout(LoginRequiredMixin, APIView):
@@ -94,5 +96,14 @@ class UserUpdateView(APIView):
 
 
 class UserProfile(APIView):
-    def get(self, request):
-        return Response(data={'detail': "profile"})
+    def get(self, request, id):
+        user = get_object_or_404(User, id=id)
+        user_serializer = UserSerializer(instance=user)
+        instructor = user.instructor
+        data = user_serializer.data
+        instructor_data = None
+        if instructor.exists():
+            instructor_serializer = InstructorSerializer(instance=instructor.annotate().first())
+            instructor_data = instructor_serializer.data
+        data.update(instructor=instructor_data)
+        return Response(data=data, status=status.HTTP_200_OK)

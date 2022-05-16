@@ -1,16 +1,14 @@
 from django.db import models
 from accounts.models import User
 
-
 from home.models import Enumerations
 
 
 class Instructor(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='instructor')
     title = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     about_you = models.TextField(null=True, default=None)
-
 
 # todo:polymorphism model with https://django-polymorphic.readthedocs.io/en/stable/quickstart.html to offer other entity
 # from course.models import Courses
