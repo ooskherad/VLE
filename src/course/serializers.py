@@ -39,11 +39,11 @@ class CourseCategorySerializer(serializers.ModelSerializer):
 
 
 class CourseSubSectionItemContentSerializer(serializers.ModelSerializer):
-    content_type_id = serializers.StringRelatedField()
+
 
     class Meta:
         model = CourseSubSectionItemContent
-        fields = ['id', 'created_at', 'course_sub_section_item', 'content', 'content_type_id', 'file']
+        fields = ['id', 'created_at', 'course_sub_section_item', 'content', 'content_type', 'file']
 
 
 class CourseSubSectionItemSerializer(serializers.ModelSerializer):
@@ -80,12 +80,13 @@ class CourseSerializer(DynamicFieldsModelSerializer):
     sections = CourseSectionSerializer(many=True, read_only=True)
     owners = CourseOwnerSerializer(many=True, write_only=True, required=False)
     categories = CourseCategorySerializer(many=True)
-    course_level = serializers.StringRelatedField()
+    level = serializers.StringRelatedField(read_only=True)
+    level_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Enumerations.objects.all())
     image = serializers.CharField(required=False)
 
     class Meta:
         model = Courses
-        fields = ['id', 'title', 'price', 'image', 'course_level', 'level', 'owners', 'categories', 'sections', ]
+        fields = ['id', 'title', 'price', 'image', 'level_id', 'level', 'owners', 'categories', 'sections', ]
 
     def create(self, validated_data):
         owners = validated_data.pop('owners')

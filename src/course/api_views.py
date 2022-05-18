@@ -153,7 +153,7 @@ class UserFeed(APIView):
         count = Courses.objects.aggregate(count=Count('id'))['count']
         limit = limit if limit < count else count - 1
         random_list = random.sample(range(1, count), limit)
-        return Courses.objects.filter(id__in=[random_list])
+        return Courses.objects.filter(id__in=random_list)
 
 
 class GetCourseSubSections(APIView):
