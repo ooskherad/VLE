@@ -2,12 +2,15 @@ from django.contrib.auth.base_user import BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, mobile, password=None):
-        if not mobile:
-            raise ValueError('Users must have an mobile')
+    def create_user(self, **kwargs):
+        if not kwargs.get('mobile'):
+            raise ValueError('Users must have a mobile')
 
-        user = self.model(mobile=mobile)
-        user.set_password(password)
+        if not kwargs.get('mobile'):
+            raise ValueError('Users must have a password')
+
+        user = self.model(mobile=kwargs.get('mobile'))
+        user.set_password(kwargs.get('password'))
         user.save(using=self._db)
         return user
 
