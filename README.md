@@ -3,6 +3,3 @@
 ### # docker-compose build
 ### # docker-compose up -d
 ### # python manage.py create_test_data
-
-### $ docker-compose build
-### $ docker-compose up -d
