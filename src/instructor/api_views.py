@@ -7,7 +7,7 @@ from .serializers import InstructorSerializer
 from helpers import SerializerContext
 
 
-class CreateInstructorView(LoginRequiredMixin, SerializerContext, APIView):
+class CreateInstructorView(SerializerContext, APIView):
     serializer_class = InstructorSerializer
 
     def post(self, request):
