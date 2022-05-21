@@ -75,7 +75,7 @@ class CourseStatus(models.Model):
     class Meta:
         db_table = 'course_status'
 
-    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING)
+    course = models.ForeignKey(to=Courses, on_delete=models.DO_NOTHING, related_name='statuses')
     status = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)

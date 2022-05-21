@@ -8,31 +8,17 @@ from course.serializers import CourseSerializer, CourseSectionSerializer, Course
 from home.serializers import CategorySerializer, EnumerationSerializer
 from home.models import Enumerations, Category, FileGroup
 from home.models import Files
+import home.enumerations as enumerations
 
 
 class Command(BaseCommand):
     help = 'create test data'
 
     def handle(self, *args, **options):
-        tables = connection.introspection.table_names()
-        seen_models = connection.introspection.installed_models(tables)
-        x = input('all tables will be truncate, are you sure? y/n: ')
-        if x == 'n':
-            return
-        for model in list(seen_models):
-            truncate(model._meta.db_table)
-        print('truncate tables successfully')
-
         user_data = [{
-            'mobile': '09372980101',
+            'mobile': '09372978889',
             'password': 1234,
-            'name': 'amir',
-            'email': 'test@email.com'
-        },
-            {
-                'mobile': '09372978889',
-                'password': 1234,
-            }]
+        }]
         users = UserSerializer(data=user_data, many=True)
         users.is_valid()
         users.save()
@@ -40,7 +26,7 @@ class Command(BaseCommand):
             print(users.errors)
             return
         print('user_created')
-        user = User.objects.get(mobile='09372980101')
+        user = User.objects.get(mobile='09372978889')
 
         instructor_data = {
             'user': user.id,
@@ -75,46 +61,11 @@ class Command(BaseCommand):
         category.save()
         print('category_created')
 
-        enum_data = [
-            {
-                'title': 'active',
-                'created_by': user.id,
-            },
-            {
-                'title': 'hard',
-                'created_by': user.id,
-            },
-            {
-                'title': 'video',
-                'created_by': user.id,
-            },
-            {
-                'title': 'file',
-                'created_by': user.id,
-            },
-            {
-                'title': 'text',
-                'created_by': user.id,
-            },
-            {
-                'title': 'image',
-                'created_by': user.id,
-            }
-        ]
-        enum = EnumerationSerializer(data=enum_data, many=True)
-        enum.is_valid()
-
-        if enum.errors:
-            print(enum.errors)
-            return
-        enum.save()
-        print('enum created')
-
         course_data = [
             {
                 "title": "آموزش پایتون",
                 "price": 0,
-                "level": Enumerations.objects.get(title='hard').id,
+                "level_id": Enumerations.objects.get(title='hard').id,
                 "categories": [
                     {
                         "category": Category.objects.get(title='programming').id
@@ -125,11 +76,16 @@ class Command(BaseCommand):
                         "instructor": 1
                     }
                 ],
+                "statuses": [
+                    {
+                        "status_id": Enumerations.objects.get(title='active').id
+                    }
+                ]
             },
             {
                 "title": "آموزش فیزیک",
                 "price": 12000,
-                "level": Enumerations.objects.get(title='hard').id,
+                "level_id": Enumerations.objects.get(title='hard').id,
                 "categories": [
                     {
                         "category": Category.objects.get(title='physic').id
@@ -140,6 +96,11 @@ class Command(BaseCommand):
                         "instructor": 1
                     }
                 ],
+                "statuses": [
+                    {
+                        "status_id": Enumerations.objects.get(title='active').id
+                    }
+                ]
             }
         ]
 
@@ -277,8 +238,3 @@ class Command(BaseCommand):
             return
         content.save()
         print('course_created')
-
-
-def truncate(table):
-    with connection.cursor() as cursor:
-        cursor.execute(f'TRUNCATE TABLE "{table}" restart identity CASCADE')

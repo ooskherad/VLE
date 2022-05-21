@@ -2,7 +2,12 @@ from enum import Enum
 
 
 class ContentTypeEnums(Enum):
-    FILE = 7
-    VIDEO = 8
-    IMAGE = 9
-    TEXT = 10
+    parent = 1
+    FILE = 2
+    VIDEO = 3
+    IMAGE = 4
+    TEXT = 5
+
+    @staticmethod
+    def parent_name():
+        return 'content_type'

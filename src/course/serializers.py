@@ -1,10 +1,8 @@
-from django.utils.text import slugify
 from rest_framework import serializers
 from django.db import transaction
 
+from home.enumerations.course_statuses_enumerations import CourseStatusEnums
 from .models import *
-from instructor.models import Instructor
-from home.serializers import CategorySerializer, EnumerationSerializer
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -39,8 +37,6 @@ class CourseCategorySerializer(serializers.ModelSerializer):
 
 
 class CourseSubSectionItemContentSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = CourseSubSectionItemContent
         fields = ['id', 'created_at', 'course_sub_section_item', 'content', 'content_type', 'file']
@@ -76,26 +72,41 @@ class CourseSectionSerializer(serializers.ModelSerializer):
         fields = ['id', 'course', 'title', 'about_section', 'created_at', 'sub_sections']
 
 
+class CourseStatusSerializer(serializers.ModelSerializer):
+    status_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Enumerations.objects.filter(
+        parent_id=CourseStatusEnums.parent.value))
+    status = serializers.StringRelatedField(read_only=True)
+    deleted_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = CourseStatus
+        fields = ['status', 'status_id', 'created_at', 'deleted_at']
+
+
 class CourseSerializer(DynamicFieldsModelSerializer):
     sections = CourseSectionSerializer(many=True, read_only=True)
     owners = CourseOwnerSerializer(many=True, write_only=True, required=False)
     categories = CourseCategorySerializer(many=True)
+    statuses = CourseStatusSerializer(many=True)
     level = serializers.StringRelatedField(read_only=True)
-    level_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Enumerations.objects.all())
+    level_id = serializers.IntegerField(write_only=True)
     image = serializers.CharField(required=False)
 
     class Meta:
         model = Courses
-        fields = ['id', 'title', 'price', 'image', 'level_id', 'level', 'owners', 'categories', 'sections', ]
+        fields = ['id', 'title', 'price', 'image', 'level', 'level_id', 'owners', 'categories', 'sections', 'statuses']
 
     def create(self, validated_data):
         owners = validated_data.pop('owners')
         categories = validated_data.pop('categories')
+        statuses = validated_data.pop('statuses')
         with transaction.atomic():
             course = Courses.objects.create(**validated_data)
             for instructor in owners:
                 CourseOwners.objects.create(course=course, instructor=instructor['instructor'])
             for category in categories:
                 CourseCategories.objects.create(category=category['category'], course=course)
+            for status in statuses:
+                CourseStatus.objects.create(status=status['status_id'], course=course)
 
         return course
