@@ -31,14 +31,14 @@ class Command(BaseCommand):
             if inspect.isclass(cls_obj):
                 members = cls_obj._member_map_
                 if members.get('parent'):
-                    parent = Enumerations.objects.create(id=members.pop('parent').value, title=cls_obj.parent_name(),
-                                                         created_by=user)
+                    members.pop('parent')
+                    parent = Enumerations.objects.create(title=cls_obj.parent_name(), created_by=user)
                     for name, value in members.items():
-                        Enumerations.objects.create(id=value.value, title=name.lower(), parent=parent, created_by=user)
+                        Enumerations.objects.create(title=name.lower(), parent=parent, created_by=user)
                 else:
                     if 'GroupFile' in cls_name:
                         for name, value in members.items():
-                            FileGroup.objects.create(id=value.value, name=name.lower(), path=f'/{name.lower()}/')
+                            FileGroup.objects.create(name=name.lower(), path=f'/{name.lower()}/')
         self.stdout.write(self.style.SUCCESS('system prepared successfully'))
 
     def add_arguments(self, parser):
