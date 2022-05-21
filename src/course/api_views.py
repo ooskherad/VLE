@@ -1,35 +1,20 @@
 import random
-from random import randint
 
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework import status
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-from helpers import SerializerContext
+from helpers import CreateAbstract as Create
 from home.services.file import FileService
 from permissions import IsInstructor
 from .serializers import *
 from home.enumerations.group_file_enumerations import GroupFileEnums
 
 
-class CreateAbstract(APIView, SerializerContext):
+class CreateAbstract(Create):
     permission_classes = [IsInstructor, ]
-
-    def create(self, data):
-        try:
-            instance = self.serializer_class(data=data)
-        except Exception as error:
-            return Response(data={'error': error.args[0] + ' not found in body'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if instance.is_valid():
-            instance.save()
-        else:
-            return Response(data=instance.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(data=instance.data, status=status.HTTP_201_CREATED)
 
 
 class CreateCoursesView(CreateAbstract):
