@@ -12,7 +12,7 @@ class Enrollments(models.Model):
     course = models.ForeignKey(to=Courses, on_delete=models.CASCADE, related_name='course_enrolls')
     user = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE, related_name='user_enrolls')
     status = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_created=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
 
 
@@ -22,7 +22,7 @@ class EnrollmentStatus(models.Model):
 
     enroll = models.ForeignKey(to=Enrollments, on_delete=models.DO_NOTHING, related_name='statuses')
     status = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_created=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
 
 
@@ -32,5 +32,5 @@ class CourseItemEnrollmentStatus(models.Model):
 
     enroll = models.ForeignKey(to=Enrollments, on_delete=models.DO_NOTHING, related_name='item_statuses')
     course_item = models.ForeignKey(to=CourseSubSectionItems, on_delete=models.DO_NOTHING)
-    created_at = models.DateTimeField(auto_created=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
