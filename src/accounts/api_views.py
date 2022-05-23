@@ -1,5 +1,3 @@
-import random
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -13,7 +11,6 @@ from accounts.models import User, OtpCode
 from accounts.serializers import UserSerializer
 from rest_framework import status
 from services.otp_service import OtpService
-from instructor.serializers import InstructorSerializer
 
 
 class UserLogout(LoginRequiredMixin, APIView):
@@ -99,11 +96,5 @@ class UserProfile(APIView):
     def get(self, request, id):
         user = get_object_or_404(User, id=id)
         user_serializer = UserSerializer(instance=user)
-        instructor = user.instructor
         data = user_serializer.data
-        instructor_data = None
-        if instructor.exists():
-            instructor_serializer = InstructorSerializer(instance=instructor.annotate().first())
-            instructor_data = instructor_serializer.data
-        data.update(instructor=instructor_data)
         return Response(data=data, status=status.HTTP_200_OK)

@@ -1,7 +1,6 @@
 from helpers import CreateAbstract as Create
 from home.serializers import CategorySerializer, EnumerationSerializer
-from permissions import IsInstructor
-from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,7 +26,7 @@ class CreateAbstract(Create):
 
 class CreateCategory(CreateAbstract):
     serializer_class = CategorySerializer
-    permission_classes = [IsInstructor, ]
+    permission_classes = [IsAuthenticated, ]
 
 
 class CreateEnumerations(CreateAbstract):

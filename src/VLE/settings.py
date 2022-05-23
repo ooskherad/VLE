@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'home.apps.HomeConfig',
     'course.apps.CourseConfig',
-    'instructor.apps.InstructorConfig',
     'enrollment.apps.EnrollConfig',
 ]
 

@@ -2,13 +2,11 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 
 from accounts.serializers import UserSerializer, User
-from instructor.serializers import InstructorSerializer
 from course.serializers import CourseSerializer, CourseSectionSerializer, CourseSubSectionSerializer, \
     CourseSubSectionItemSerializer, CourseSubSectionItemContentSerializer
 from home.serializers import CategorySerializer, EnumerationSerializer
 from home.models import Enumerations, Category, FileGroup
 from home.models import Files
-import home.enumerations as enumerations
 
 
 class Command(BaseCommand):
@@ -27,20 +25,6 @@ class Command(BaseCommand):
             return
         print('user_created')
         user = User.objects.get(mobile='09372978889')
-
-        instructor_data = {
-            'user': user.id,
-            'title': 'Untitled',
-            'about_yot': 'I Love Python',
-
-        }
-        instructor = InstructorSerializer(data=instructor_data)
-        instructor.is_valid()
-        if instructor.errors:
-            print(instructor.errors)
-            return
-        instructor.save()
-        print('instructor_created')
 
         category_data = [
             {
@@ -73,7 +57,7 @@ class Command(BaseCommand):
                 ],
                 "owners": [
                     {
-                        "instructor": 1
+                        "user": 1
                     }
                 ],
                 "statuses": [
@@ -93,7 +77,7 @@ class Command(BaseCommand):
                 ],
                 "owners": [
                     {
-                        "instructor": 1
+                        "user": 1
                     }
                 ],
                 "statuses": [

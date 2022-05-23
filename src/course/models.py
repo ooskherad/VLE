@@ -1,7 +1,7 @@
 from django.db import models
 
 from home.models import Enumerations, Files, Category
-from instructor.models import Instructor
+from accounts.models import User
 
 
 class Courses(models.Model):
@@ -33,7 +33,7 @@ class CourseOwners(models.Model):
         db_table = 'course_owners'
 
     course = models.ForeignKey(to=Courses, on_delete=models.CASCADE, related_name='owners')
-    instructor = models.ForeignKey(to=Instructor, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
 
 
 class CourseSections(models.Model):

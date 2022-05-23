@@ -5,16 +5,16 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from helpers import CreateAbstract as Create
 from home.services.file import FileService
-from permissions import IsInstructor
 from .serializers import *
 from home.enumerations.group_file_enumerations import GroupFileEnums
 
 
 class CreateAbstract(Create):
-    permission_classes = [IsInstructor, ]
+    permission_classes = [IsAuthenticated, ]
 
 
 class CreateCoursesView(CreateAbstract):
@@ -25,8 +25,8 @@ class CreateCoursesView(CreateAbstract):
         ### owners parameter is optional now (it will need for add owner to a course)
         """
         data = request.data
-        instructor = Instructor.objects.get(user=request.user)
-        data.update(owners=[{'instructor': instructor.id}])
+        user = request.user
+        data.update(owners=[{'user': request.user}])
         if data.get('image'):
             image = data.pop('image')[0]
             file_service = FileService(file=image.file, file_name=image.name, user=request.user,

@@ -24,7 +24,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class CourseOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseOwners
-        fields = ['instructor', ]
+        fields = ['user', ]
 
 
 class CourseCategorySerializer(serializers.ModelSerializer):
@@ -102,8 +102,8 @@ class CourseSerializer(DynamicFieldsModelSerializer):
         statuses = validated_data.pop('statuses')
         with transaction.atomic():
             course = Courses.objects.create(**validated_data)
-            for instructor in owners:
-                CourseOwners.objects.create(course=course, instructor=instructor['instructor'])
+            for owner in owners:
+                CourseOwners.objects.create(course=course, user=owner['user'])
             for category in categories:
                 CourseCategories.objects.create(category=category['category'], course=course)
             for status in statuses:
