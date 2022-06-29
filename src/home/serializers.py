@@ -10,7 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'title', 'parent', 'created_by']
+        fields = ['id', 'title', 'parent', 'created_by', 'icon']
 
 
 class EnumerationSerializer(serializers.ModelSerializer):

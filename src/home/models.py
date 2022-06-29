@@ -5,6 +5,7 @@ from accounts.models import User
 class Category(models.Model):
     title = models.CharField(max_length=20)
     parent = models.ForeignKey(to="self", on_delete=models.CASCADE, null=True)
+    icon = models.ImageField(default='category_icon.jpeg')
     created_by = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
 

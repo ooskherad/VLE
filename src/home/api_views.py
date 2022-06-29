@@ -43,7 +43,7 @@ class GetCategories(APIView):
         :return: categories with details
         """
         parents = Category.objects.filter(parent__isnull=True)
-        data = {}
+        data = []
         for parent in parents:
             parent_categories = Category.objects.filter(parent_id=parent.id)
             parent_data = CategorySerializer(instance=parent).data
@@ -53,7 +53,8 @@ class GetCategories(APIView):
                 parent_course_count += categories_count['course__count']
                 serializer = CategorySerializer(instance=category).data
                 serializer.update(categories_count)
-                parent_data.update(category=serializer)
-            parent_data.update({'parent_course_count': 0})
-            data.update(parent_data)
+                parent_data.update(categories=serializer)
+            parent_data.update({'parent_course_count': parent_course_count})
+            data.append(parent_data)
+            data.sort(key=lambda x:x.get('parent_course_count'), reverse=True)
         return Response(data, status=status.HTTP_200_OK)
