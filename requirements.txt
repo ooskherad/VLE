@@ -10,5 +10,5 @@ psycopg2-binary
 kavenegar~=1.1.2
 django-cors-headers
 pydantic~=1.9.0
-drf-yasg
+drf-yasg~=1.20.0
 botocore~=1.24.28

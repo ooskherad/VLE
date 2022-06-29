@@ -12,4 +12,4 @@ COPY . /code/
 
 EXPOSE 8000
 
-CMD ["gunicorn", "VLE.wsgi", ":8000"]
+CMD ["python3", "src/manage.py", "runservcer"]

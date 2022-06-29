@@ -10,7 +10,8 @@ ALLOWED_HOSTS = ['*']
 
 WSGI_APPLICATION = 'VLE.wsgi.application'
 ROOT_URLCONF = 'VLE.urls'
-STATIC_URL = 'static/'  # https://docs.djangoproject.com/en/4.0/howto/static-files/
+STATIC_URL = '/static/'  # https://docs.djangoproject.com/en/4.0/howto/static-files/
+STATIC_ROOT = "static/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 

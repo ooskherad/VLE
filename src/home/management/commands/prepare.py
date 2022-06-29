@@ -8,6 +8,7 @@ import home.enumerations
 from accounts.models import User
 from home.models import Enumerations
 from home.models import FileGroup
+from rest_framework.authtoken.models import Token
 
 
 class Command(BaseCommand):
@@ -27,6 +28,8 @@ class Command(BaseCommand):
             'name': 'سیستم',
             'email': 'admin@email.com'
         })
+        token = Token.objects.get_or_create(user=user)
+        print(f'token: {token}')
         for cls_name, cls_obj in inspect.getmembers(sys.modules['home.enumerations']):
             if inspect.isclass(cls_obj):
                 members = cls_obj._member_map_

@@ -6,7 +6,7 @@ class Config(BaseSettings):
     APP_TITLE = "virtual learning environment"
 
     SECRET_KEY = ''
-    DATABASE_NAME = 'vle'
+    DATABASE_NAME = 'postgres'
     DATABASE_USER = 'postgres'
     DATABASE_PASSWORD = '1234'
     DATABASE_HOST = 'localhost'
