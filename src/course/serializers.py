@@ -37,31 +37,37 @@ class CourseCategorySerializer(serializers.ModelSerializer):
 
 
 class CourseSubSectionItemContentSerializer(serializers.ModelSerializer):
+    file = serializers.StringRelatedField()
+    file_id = serializers.IntegerField(write_only=True, required=False)
+    course_sub_section_item = serializers.StringRelatedField()
+    course_sub_section_item_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = CourseSubSectionItemContent
-        fields = ['id', 'created_at', 'course_sub_section_item', 'content', 'content_type', 'file']
+        fields = ['id', 'created_at', 'course_sub_section_item_id', 'content', 'content_type', 'file', 'file_id',
+                  'course_sub_section_item']
 
 
-class CourseSubSectionItemSerializer(serializers.ModelSerializer):
-    sub_section_item_content = CourseSubSectionItemContentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = CourseSubSectionItems
-        fields = ['id', 'course_sub_section', 'title', 'type', 'time_duration', 'price', 'created_at',
-                  'sub_section_item_content']
-
-    def validate_time_duration(self, attrs):
-        if attrs <= 0:
-            raise serializers.ValidationError('time duration must an positive integer number (in second) ')
-        return attrs
+# class CourseSubSectionItemSerializer(serializers.ModelSerializer):
+#     sub_section_item_content = CourseSubSectionItemContentSerializer(many=True, read_only=True)
+#
+#     class Meta:
+#         model = CourseSubSectionItems
+#         fields = ['id', 'course_sub_section', 'title', 'type', 'time_duration', 'price', 'created_at',
+#                   'sub_section_item_content']
+#
+#     def validate_time_duration(self, attrs):
+#         if attrs <= 0:
+#             raise serializers.ValidationError('time duration must an positive integer number (in second) ')
+#         return attrs
 
 
 class CourseSubSectionSerializer(serializers.ModelSerializer):
-    sub_section_item = CourseSubSectionItemSerializer(many=True, read_only=True)
+    sub_section_item = CourseSubSectionItemContentSerializer(many=True, read_only=True)
 
     class Meta:
         model = CourseSubSections
-        fields = ['id', 'course_section', 'title', 'created_at', 'sub_section_item']
+        fields = ['id', 'course_section', 'title', 'created_at', 'time_duration', 'sub_section_item']
 
 
 class CourseSectionSerializer(serializers.ModelSerializer):
@@ -85,16 +91,20 @@ class CourseStatusSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(DynamicFieldsModelSerializer):
     sections = CourseSectionSerializer(many=True, read_only=True)
-    owners = CourseOwnerSerializer(many=True, write_only=True, required=False)
+    owners = CourseOwnerSerializer(many=True, required=False)
     categories = CourseCategorySerializer(many=True)
     statuses = CourseStatusSerializer(many=True)
     level = serializers.StringRelatedField(read_only=True)
     level_id = serializers.IntegerField(write_only=True)
     image = serializers.CharField(required=False)
+    created_at = serializers.DateTimeField(read_only=True)
+    about_course = serializers.CharField(required=False)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Courses
-        fields = ['id', 'title', 'price', 'image', 'level', 'level_id', 'owners', 'categories', 'sections', 'statuses']
+        fields = ['id', 'title', 'price', 'image', 'level', 'level_id', 'owners', 'categories', 'sections', 'statuses',
+                  'created_at', 'about_course', 'id']
 
     def create(self, validated_data):
         owners = validated_data.pop('owners')
