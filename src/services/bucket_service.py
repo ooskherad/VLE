@@ -2,6 +2,8 @@ import boto3
 from VLE.config import config
 from botocore.exceptions import ClientError
 
+from VLE.settings import BASE_DIR
+
 
 class Bucket:
     _client = None
@@ -27,7 +29,7 @@ class Bucket:
         with open(file_path, "rb") as file:
             self.upload_file(file, object_name, bucket_name, acl)
 
-    def upload_file(self, file, object_name, bucket_name=config.AWS_STORAGE_BUCKET_NAME, acl='private'):
+    def upload_file(self, file, object_name, bucket_name=config.AWS_STORAGE_BUCKET_NAME, acl='public-read'):
         try:
             bucket = self.get_resource().Bucket(bucket_name)
             return bucket.put_object(
@@ -75,6 +77,7 @@ class Bucket:
         with open(object_name, 'wb') as f:
             client = self.get_client()
             client.download_fileobj(bucket_name, object_name, f)
+            return BASE_DIR.__str__() + '/' + object_name
 
 
 bucket = Bucket()
