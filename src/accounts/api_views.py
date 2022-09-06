@@ -41,10 +41,11 @@ class UserLogin(APIView):
 
 class UserRegistrationVerifyOtpView(APIView):
     def post(self, request, *args, **kwargs):
-        user_session = request.session['user_registration_info']
-        if OtpService.check_code(user_session['mobile'], int(request.data['code'])):
-            user = User.objects.create_user(mobile=user_session['mobile'], password=user_session['password'])
-            OtpCode.objects.filter(mobile=user_session['mobile']).delete()
+        mobile = request.data['mobile']
+        password = request.data['password']
+        if OtpService.check_code(mobile, int(request.data['code'])):
+            user = User.objects.create_user(mobile=mobile, password=password)
+            OtpCode.objects.filter(mobile=mobile).delete()
             token = Token.objects.get_or_create(user=user)
             return Response(data={'token': token[0].__str__()}, status=status.HTTP_201_CREATED)
         return Response(data={'details': 'Wrong Code'}, status=status.HTTP_400_BAD_REQUEST)
