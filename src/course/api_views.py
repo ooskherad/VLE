@@ -1,14 +1,20 @@
+import json
 import random
 
-from django.db.models import Count
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Count, Aggregate
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.http.response import HttpResponse
+import mimetypes
 
+from VLE.config import config
 from helpers import CreateAbstract as Create
 from home.services.file import FileService
+from services.bucket_service import Bucket
 from .serializers import *
 from home.enumerations.group_file_enumerations import GroupFileEnums
 
@@ -25,14 +31,22 @@ class CreateCoursesView(CreateAbstract):
         ### owners parameter is optional now (it will need for add owner to a course)
         """
         data = request.data
+        data = data.dict()
+        data['categories'] = json.loads(data.get('categories'))
         user = request.user
-        data.update(owners=[{'user': request.user}])
-        if data.get('image'):
-            image = data.pop('image')[0]
+        data.update(owners=[{'user': user.id}])
+        if not data.get("statuses"):
+            data["statuses"] = [
+                {
+                    "status_id": 11
+                }
+            ]
+        if data.get('image') and data.get('image') != 'null':
+            image = data.pop('image')
             file_service = FileService(file=image.file, file_name=image.name, user=request.user,
-                                       group_file=GroupFileEnums.COURSE_FILES)
-            file_instance = file_service.upload_and_save()
-            request.data.update(image=file_instance.title)
+                                       group_file=GroupFileEnums.COURSE_FILES.value)
+            file_name = file_service.upload_file()
+            data.update(image=file_name.key)
         return self.create(data)
 
 
@@ -55,34 +69,56 @@ class CreateCourseSubSectionView(CreateAbstract):
         return self.create(request.data)
 
 
-class CreateCourseSubSectionItemView(CreateAbstract):
-    serializer_class = CourseSubSectionItemSerializer
-
-    def post(self, request):
-        course_sub_section = get_object_or_404(CourseSubSections, id=request.data.get('course_sub_section'))
-        course_section = course_sub_section.course_section
-        course = course_section.course
-        self.check_object_permissions(request, course)
-        return self.create(request.data)
+# class CreateCourseSubSectionItemView(CreateAbstract):
+#     serializer_class = CourseSubSectionItemSerializer
+#
+#     def post(self, request):
+#         course_sub_section = get_object_or_404(CourseSubSections, id=request.data.get('course_sub_section'))
+#         course_section = course_sub_section.course_section
+#         course = course_section.course
+#         self.check_object_permissions(request, course)
+#         return self.create(request.data)
 
 
 class CreateItemContentView(CreateAbstract):
     serializer_class = CourseSubSectionItemContentSerializer
 
     def post(self, request):
-        course_sub_section_item = get_object_or_404(CourseSubSectionItems,
-                                                    id=request.data.get('course_sub_section_item'))
-        course_sub_section = course_sub_section_item.course_sub_section
+        data = request.data
+        data = data.dict()
+        course_sub_section = get_object_or_404(CourseSubSections,
+                                               id=data.get('course_sub_section_item_id'))
         course_section = course_sub_section.course_section
         course = course_section.course
         self.check_object_permissions(request, course)
         file = request.FILES
         if file:
+            data.pop('file')
             file_service = FileService(file=file.get('file').file, file_name=file.get('file').name, user=request.user,
-                                       group_file=GroupFileEnums.COURSE_CONTENTS)
+                                       group_file=GroupFileEnums.COURSE_CONTENTS.value)
             file_instance = file_service.upload_and_save()
-            request.data.update(file_id=file_instance.id)
-        return self.create(request.data)
+            data.update(file_id=file_instance.id)
+        return self.create(data)
+
+
+class GetCourseData(APIView):
+
+    def get(self, request):
+        """
+        courseId as query parameter
+        :param request:
+        :return:
+        """
+        param = request.GET
+        if param.get('courseId'):
+            course_instance = Courses.objects.filter(id=int(param.get('courseId')))
+            if course_instance:
+                # instance = CourseSections.objects.filter(course_id=int(param.get('courseId')))
+                # sections = CourseSectionSerializer(instance=instance, many=True)
+                course = CourseSerializer(instance=course_instance, many=True)
+                course.data[0]['image'] = config.ARVAN_URl + course.data[0]['image']
+                return Response(course.data[0], status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class GetCourses(APIView):
@@ -130,14 +166,19 @@ class UserFeed(APIView):
             params = request.GET
             limit = int(params.get('limit')) if params.get('limit') else 6
             courses = CourseSerializer(instance=self.get_query_set(limit), many=True, fields=['sections'])
+            for course in courses.data:
+                course["image"] = config.ARVAN_URl + course["image"]
             return Response(data=courses.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(data={'error': e.args[0]}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_query_set(self, limit):
-        count = Courses.objects.aggregate(count=Count('id'))['count']
-        limit = limit if limit < count else count - 1
-        random_list = random.sample(range(1, count), limit)
+        ids= Courses.objects.all().aggregate(arr=ArrayAgg('id'))
+        limit = limit if limit < len(ids.get('arr')) else len(ids.get('arr'))
+        # count = Courses.objects.aggregate(count=Count('id'))['count']
+        # limit = limit if limit < count else count - 1
+        # random_list = random.sample(range(1, 10), limit)
+        random_list = random.sample(ids.get('arr'), k=limit)
         return Courses.objects.filter(id__in=random_list)
 
 
@@ -156,6 +197,21 @@ class GetCourseSubSections(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+# class GetCourseSubSectionItems(APIView):
+#     def get(self, request):
+#         """
+#         <int:subsection (course_subsection_id)>
+#         :return: list of a CourseSectionsItems, 404 if not exist
+#         """
+#         param = request.GET
+#         if param.get('ssID'):
+#             instance = CourseSubSectionItems.objects.filter(course_sub_section_id=int(param.get('ssID')))
+#             if instance:
+#                 sections = CourseSubSectionItemSerializer(instance=instance, many=True)
+#                 return Response(sections.data, status.HTTP_200_OK)
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class GetContent(APIView):
     def get(self, request):
         """
@@ -164,9 +220,21 @@ class GetContent(APIView):
         :return:list of content of an item,  404 if not exist
         """
         param = request.GET
-        if param.get('item'):
-            instance = CourseSubSectionItemContent.objects.filter(course_sub_section_item_id=int(param.get('item')))
+        if param.get('subSection'):
+            instance = CourseSubSectionItemContent.objects.filter(course_sub_section_item_id=int(param.get('subSection')))
             if instance:
                 content = CourseSubSectionItemContentSerializer(instance=instance, many=True)
+                for item in content.data:
+                    item['file'] = config.ARVAN_URl + item.get('file')
                 return Response(content.data, status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class DownloadContent(APIView):
+    def get(self, request, file_name):
+        filepath = Bucket().download_obj(file_name)
+        mime_type, _ = mimetypes.guess_type(filepath)
+        path = open(filepath, 'rb')
+        response = HttpResponse(path.read(), content_type=mime_type)
+        response['Content-Disposition'] = "attachment; filename=%s" % file_name
+        return response
