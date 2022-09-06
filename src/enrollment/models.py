@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from course.models import Courses, CourseSubSectionItems
+from course.models import Courses, CourseSubSections
 from home.models import Enumerations
 
 
@@ -31,6 +31,6 @@ class CourseItemEnrollmentStatus(models.Model):
         db_table = 'course_item_enrollment_status'
 
     enroll = models.ForeignKey(to=Enrollments, on_delete=models.DO_NOTHING, related_name='item_statuses')
-    course_item = models.ForeignKey(to=CourseSubSectionItems, on_delete=models.DO_NOTHING)
+    course_item = models.ForeignKey(to=CourseSubSections, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
