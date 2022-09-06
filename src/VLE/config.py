@@ -20,6 +20,7 @@ class Config(BaseSettings):
     AWS_SERVICE_NAME = ''
     AWS_S3_ENDPOINT_URL = ''
     AWS_S3_FILE_OVERWRITE = ''
+    ARVAN_URl = 'https://finalproject.s3.ir-thr-at1.arvanstorage.com/'
 
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = 'smtp.gmail.com'
