@@ -10,6 +10,7 @@ class Courses(models.Model):
     price = models.FloatField(default=0)
     level = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     image = models.ImageField(default='course_default.jpeg')
+    about_course = models.TextField(null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
     updated_at = models.DateTimeField(auto_now=True)
@@ -52,23 +53,29 @@ class CourseSubSections(models.Model):
         db_table = 'course_sub_sections'
 
     title = models.CharField(max_length=255)
+    time_duration = models.IntegerField(null=True, default=None)
+    # price = models.FloatField(default=0) #todo : add price for section
     course_section = models.ForeignKey(to=CourseSections, on_delete=models.DO_NOTHING, related_name='sub_sections')
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
 
 
-class CourseSubSectionItems(models.Model):
-    class Meta:
-        db_table = 'course_sub_section_items'
+    def __str__(self):
+        return self.title
 
-    course_sub_section = models.ForeignKey(to=CourseSubSections, on_delete=models.DO_NOTHING,
-                                           related_name='sub_section_item')
-    title = models.CharField(max_length=255)
-    type = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
-    time_duration = models.IntegerField()
-    price = models.FloatField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField(null=True, default=None)
+
+# class CourseSubSectionItems(models.Model):
+#     class Meta:
+#         db_table = 'course_sub_section_items'
+#
+#     course_sub_section = models.ForeignKey(to=CourseSubSections, on_delete=models.DO_NOTHING,
+#                                            related_name='sub_section_item')
+#     title = models.CharField(max_length=255)
+#     type = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
+#     time_duration = models.IntegerField()
+#     price = models.FloatField(default=0)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     deleted_at = models.DateTimeField(null=True, default=None)
 
 
 class CourseStatus(models.Model):
@@ -86,9 +93,9 @@ class CourseSubSectionItemContent(models.Model):
     class Meta:
         db_table = 'course_sub_section_item_contents'
 
-    course_sub_section_item = models.ForeignKey(to=CourseSubSectionItems, on_delete=models.DO_NOTHING,
+    course_sub_section_item = models.ForeignKey(to=CourseSubSections, on_delete=models.DO_NOTHING,
                                                 related_name='sub_section_item_content')
-    content = models.CharField(max_length=255, null=True, default=None)
+    content = models.TextField(null=True, default=None)
     content_type = models.ForeignKey(to=Enumerations, on_delete=models.DO_NOTHING)
     file = models.ForeignKey(to=Files, on_delete=models.CASCADE, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
