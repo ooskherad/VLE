@@ -37,3 +37,6 @@ class Files(models.Model):
     created_by = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, default=None)
+
+    def __str__(self):
+        return self.title
