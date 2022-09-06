@@ -3,7 +3,7 @@ from django.db import connection
 
 from accounts.serializers import UserSerializer, User
 from course.serializers import CourseSerializer, CourseSectionSerializer, CourseSubSectionSerializer, \
-    CourseSubSectionItemSerializer, CourseSubSectionItemContentSerializer
+    CourseSubSectionItemContentSerializer
 from home.serializers import CategorySerializer, EnumerationSerializer
 from home.models import Enumerations, Category, FileGroup
 from home.models import Files
@@ -64,7 +64,8 @@ class Command(BaseCommand):
                     {
                         "status_id": Enumerations.objects.get(title='active').id
                     }
-                ]
+                ],
+                "about_course": "    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
             },
             {
                 "title": "آموزش فیزیک",
@@ -84,7 +85,8 @@ class Command(BaseCommand):
                     {
                         "status_id": Enumerations.objects.get(title='active').id
                     }
-                ]
+                ],
+                "about_course": "    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
             }
         ]
 
@@ -130,47 +132,42 @@ class Command(BaseCommand):
                 'title': 'فایل های درس'
             }
         ]
-        sub = CourseSubSectionSerializer(data=sub_data, many=True)
-        sub.is_valid()
-        if sub.errors:
-            print(sub.errors)
-            return
-        sub.save()
+        # sub = CourseSubSectionSerializer(data=sub_data, many=True)
+        # sub.is_valid()
+        # if sub.errors:
+        #     print(sub.errors)
+        #     return
+        # sub.save()
 
         item_data = [
             {
-                'course_sub_section': 1,
+                'course_section': 1,
                 'title': 'آشنایی با فصل',
                 'type': Enumerations.objects.get(title='video').id,
                 'time_duration': 180,
-                'price': 0,
             }, {
-                'course_sub_section': 2,
+                'course_section': 2,
                 'title': 'بخش ۱',
                 'type': Enumerations.objects.get(title='video').id,
                 'time_duration': 180,
-                'price': 0,
             }, {
-                'course_sub_section': 2,
+                'course_section': 2,
                 'title': 'بخش ۲',
                 'type': Enumerations.objects.get(title='video').id,
                 'time_duration': 180,
-                'price': 0,
             }, {
-                'course_sub_section': 2,
+                'course_section': 2,
                 'title': 'آزمون فصل ۱ و ۲',
                 'type': Enumerations.objects.get(title='video').id,
                 'time_duration': 180,
-                'price': 0,
             }, {
-                'course_sub_section': 3,
+                'course_section': 3,
                 'title': 'جزوه فصل ۱ و۲',
                 'type': Enumerations.objects.get(title='video').id,
                 'time_duration': 180,
-                'price': 0,
             }
         ]
-        items = CourseSubSectionItemSerializer(data=item_data, many=True)
+        items = CourseSubSectionSerializer(data=item_data, many=True)
         items.is_valid()
         if items.errors:
             print(items.errors)
