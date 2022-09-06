@@ -1,9 +1,12 @@
 from helpers import CreateAbstract as Create
 from home.serializers import CategorySerializer, EnumerationSerializer
+from home.models import Enumerations
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .enumerations import CourseLevelEnums
 from .models import Category
 from course.models import CourseCategories
 from django.db.models import Count
@@ -34,6 +37,13 @@ class CreateEnumerations(CreateAbstract):
     permission_classes = [IsAdminUser, ]
 
 
+class GetCourseLevels(APIView):
+    def get(self, request):
+        levels = Enumerations.objects.filter(parent_id=CourseLevelEnums.parent.value)
+        levels_serializer = EnumerationSerializer(instance=levels, many=True).data
+        return Response(levels_serializer, status=status.HTTP_200_OK)
+
+
 class GetCategories(APIView):
 
     def get(self, request):
@@ -56,5 +66,5 @@ class GetCategories(APIView):
                 parent_data.update(categories=serializer)
             parent_data.update({'parent_course_count': parent_course_count})
             data.append(parent_data)
-            data.sort(key=lambda x:x.get('parent_course_count'), reverse=True)
+            data.sort(key=lambda x: x.get('parent_course_count'), reverse=True)
         return Response(data, status=status.HTTP_200_OK)
