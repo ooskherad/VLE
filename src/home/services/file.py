@@ -18,19 +18,21 @@ class FileService:
         self.group_file = group_file
 
     def upload_and_save(self):
-        self.upload_file()
-        return self.save_in_files()
+        file = self.upload_file()
+        return self.save_in_files(file.key)
 
     def upload_file(self):
         name = self.make_obj_name
-        self.upload_data = bucket.upload_file(file=self.file, object_name=name).get()
+        file = bucket.upload_file(file=self.file, object_name=name)
+        self.upload_data = file.get()
+        return file
 
-    def save_in_files(self):
+    def save_in_files(self, title):
         if self.successful_update:
             return Files.objects.create(
                 type=self.file_content_type,  # todo: must in enum
                 format=self.file_format,
-                title=self.make_obj_name,
+                title=title,
                 size=self.file_size,
                 created_by=self.user,
                 group_id=self.group_file,
